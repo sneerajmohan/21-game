@@ -9,12 +9,20 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <div>
+      <div class="title-block">
         <h1>Don’t Say 21</h1>
         <p>
           Say 1, 2, or 3 numbers each turn. The game always starts with 1.
           The maximum number is 21. Whoever says 21 loses.
         </p>
+
+        <div class="mode-row">
+          <label for="difficulty">Mode</label>
+          <select id="difficulty">
+            <option value="normal">Normal</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
       </div>
 
       <button id="resetBtn">Reset</button>

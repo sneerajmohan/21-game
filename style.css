@@ -33,6 +33,10 @@ body {
   gap: 12px;
 }
 
+.title-block {
+  min-width: 0;
+}
+
 .topbar h1 {
   margin: 0;
   font-size: 22px;
@@ -44,6 +48,27 @@ body {
   font-size: 13px;
   line-height: 1.35;
   color: #555555;
+}
+
+.mode-row {
+  margin-top: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-row label {
+  font-size: 13px;
+  color: #555555;
+}
+
+.mode-row select {
+  border: 1px solid #dddddd;
+  background: #ffffff;
+  color: #111111;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
 }
 
 #resetBtn {
@@ -194,8 +219,6 @@ body {
   .app {
     max-width: 520px;
     margin: 0 auto;
-    border-left: 1px solid #eeeeee;
-    border-right: 1px solid #eeeeee;
   }
 }
 

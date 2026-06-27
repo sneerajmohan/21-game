@@ -7,8 +7,11 @@ const chatEl = document.getElementById("chat");
 const currentNumberEl = document.getElementById("currentNumber");
 const resetBtn = document.getElementById("resetBtn");
 const moveButtons = document.querySelectorAll(".moveBtn");
+const difficultyEl = document.getElementById("difficulty");
 
 resetBtn.addEventListener("click", resetGame);
+
+difficultyEl.addEventListener("change", resetGame);
 
 moveButtons.forEach(button => {
   button.addEventListener("click", () => {
@@ -52,7 +55,6 @@ function resetGame() {
 function userMove(move) {
   if (gameOver || !userTurn) return;
 
-  // The game must always start with 1.
   if (current === 0 && move !== 1) return;
 
   const userNumbers = sayNumbers(move);
@@ -104,16 +106,14 @@ function systemMove() {
 
   const targets = [4, 8, 12, 16, 20];
 
-  // If current is 20, system is forced to say 21 and lose.
   const safeMoves = [1, 2, 3].filter(move => current + move < 21);
 
   if (safeMoves.length === 0) {
     return 1;
   }
 
-  // System plays smart only sometimes.
-  // Lower = easier, higher = harder.
-  const smartChance = 0.2;
+  const difficulty = difficultyEl.value;
+  const smartChance = difficulty === "hard" ? 1.0 : 0.20;
 
   if (Math.random() < smartChance) {
     for (const move of safeMoves) {
@@ -123,7 +123,6 @@ function systemMove() {
     }
   }
 
-  // Otherwise random safe move.
   return safeMoves[Math.floor(Math.random() * safeMoves.length)];
 }
 
@@ -156,6 +155,7 @@ function showShareResult() {
   const text =
 `I played "Don’t Say 21."
 
+Mode: ${difficultyEl.value}
 Winner: ${winnerText}
 
 Play here: ${gameLink}`;
@@ -233,8 +233,6 @@ function updateMoveButtons() {
       return;
     }
 
-    // Keep all buttons available near the end.
-    // If current is 20, pressing any button ends at 21 and the user loses.
     button.disabled = false;
   });
 }
