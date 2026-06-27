@@ -52,6 +52,7 @@ function resetGame() {
 function userMove(move) {
   if (gameOver || !userTurn) return;
 
+  // The game must always start with 1.
   if (current === 0 && move !== 1) return;
 
   const userNumbers = sayNumbers(move);
@@ -82,12 +83,14 @@ function sayNumbers(move) {
 
   for (let i = 0; i < move; i++) {
     current += 1;
-    numbers.push(current);
 
     if (current >= 21) {
       current = 21;
+      numbers.push(current);
       break;
     }
+
+    numbers.push(current);
   }
 
   currentNumberEl.textContent = current;
@@ -101,19 +104,26 @@ function systemMove() {
 
   const targets = [4, 8, 12, 16, 20];
 
-  const possibleMoves = [1, 2, 3].filter(move => current + move <= 21);
-  const safeMoves = possibleMoves.filter(move => current + move < 21);
+  // If current is 20, system is forced to say 21 and lose.
+  const safeMoves = [1, 2, 3].filter(move => current + move < 21);
 
   if (safeMoves.length === 0) {
     return 1;
   }
 
-  for (const move of safeMoves) {
-    if (targets.includes(current + move)) {
-      return move;
+  // System plays smart only sometimes.
+  // Lower = easier, higher = harder.
+  const smartChance = 0.45;
+
+  if (Math.random() < smartChance) {
+    for (const move of safeMoves) {
+      if (targets.includes(current + move)) {
+        return move;
+      }
     }
   }
 
+  // Otherwise random safe move.
   return safeMoves[Math.floor(Math.random() * safeMoves.length)];
 }
 
@@ -125,11 +135,11 @@ function checkLoss(playerName) {
     if (playerName === "You") {
       winner = "System";
       addInfo("You said 21. You lost.");
-      addMessage("system", "System", "I win");
+      addMessage("system", "System", "I win :)");
     } else {
       winner = "You";
       addInfo("System said 21. You win!");
-      addMessage("system", "System", "I lost");
+      addMessage("system", "System", "I lost :(");
     }
 
     showShareResult();
@@ -141,15 +151,14 @@ function checkLoss(playerName) {
 
 function showShareResult() {
   const gameLink = window.location.href;
-
   const winnerText = winner === "You" ? "You :)" : "System :(";
 
   const text =
-    `I played "Don’t Say 21."
+`I played "Don’t Say 21."
 
-    Winner: ${winnerText}
+Winner: ${winnerText}
 
-    Play here: ${gameLink}`;
+Play here: ${gameLink}`;
 
   const card = document.createElement("div");
   card.className = "share-card";
@@ -224,6 +233,8 @@ function updateMoveButtons() {
       return;
     }
 
+    // Keep all buttons available near the end.
+    // If current is 20, pressing any button ends at 21 and the user loses.
     button.disabled = false;
   });
 }
