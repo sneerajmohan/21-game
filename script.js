@@ -52,7 +52,6 @@ function resetGame() {
 function userMove(move) {
   if (gameOver || !userTurn) return;
 
-  // The first number must always be 1.
   if (current === 0 && move !== 1) return;
 
   const userNumbers = sayNumbers(move);
@@ -83,14 +82,12 @@ function sayNumbers(move) {
 
   for (let i = 0; i < move; i++) {
     current += 1;
+    numbers.push(current);
 
     if (current >= 21) {
       current = 21;
-      numbers.push(current);
       break;
     }
-
-    numbers.push(current);
   }
 
   currentNumberEl.textContent = current;
@@ -128,11 +125,11 @@ function checkLoss(playerName) {
     if (playerName === "You") {
       winner = "System";
       addInfo("You said 21. You lost.");
-      addMessage("system", "System", "I win :)");
+      addMessage("system", "System", "I win");
     } else {
       winner = "You";
       addInfo("System said 21. You win!");
-      addMessage("system", "System", "I lost :(");
+      addMessage("system", "System", "I lost");
     }
 
     showShareResult();
@@ -144,14 +141,15 @@ function checkLoss(playerName) {
 
 function showShareResult() {
   const gameLink = window.location.href;
+
   const winnerText = winner === "You" ? "You :)" : "System :(";
 
   const text =
-`I played "Don’t Say 21."
+    `I played "Don’t Say 21."
 
-Winner: ${winnerText}
+    Winner: ${winnerText}
 
-Play here: ${gameLink}`;
+    Play here: ${gameLink}`;
 
   const card = document.createElement("div");
   card.className = "share-card";
@@ -221,14 +219,11 @@ function updateMoveButtons() {
   moveButtons.forEach(button => {
     const move = Number(button.dataset.move);
 
-    // At the start, only +1 is allowed because the game must start with 1.
     if (current === 0 && move !== 1) {
       button.disabled = true;
       return;
     }
 
-    // Keep +1, +2, +3 available near the end.
-    // If current is 20, any button press ends at 21 and the player loses.
     button.disabled = false;
   });
 }
