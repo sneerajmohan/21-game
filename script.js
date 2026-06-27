@@ -1,13 +1,35 @@
 let current = 0;
 let gameOver = false;
 let userTurn = true;
+let winner = "";
 
 const chatEl = document.getElementById("chat");
 const currentNumberEl = document.getElementById("currentNumber");
 const resetBtn = document.getElementById("resetBtn");
 const moveButtons = document.querySelectorAll(".moveBtn");
 
+const shareBox = document.getElementById("shareBox");
+const shareText = document.getElementById("shareText");
+const copyBtn = document.getElementById("copyBtn");
+
 resetBtn.addEventListener("click", resetGame);
+
+copyBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(shareText.value);
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => {
+      copyBtn.textContent = "Copy result";
+    }, 1200);
+  } catch {
+    shareText.select();
+    document.execCommand("copy");
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => {
+      copyBtn.textContent = "Copy result";
+    }, 1200);
+  }
+});
 
 moveButtons.forEach(button => {
   button.addEventListener("click", () => {
@@ -19,8 +41,11 @@ moveButtons.forEach(button => {
 function resetGame() {
   current = 0;
   gameOver = false;
+  winner = "";
   chatEl.innerHTML = "";
   currentNumberEl.textContent = current;
+  shareBox.classList.add("hidden");
+  shareText.value = "";
 
   const userStarts = Math.random() < 0.5;
 
@@ -50,7 +75,6 @@ function resetGame() {
 function userMove(move) {
   if (gameOver || !userTurn) return;
 
-  // First number must always be 1.
   if (current === 0 && move !== 1) return;
 
   const userNumbers = sayNumbers(move);
@@ -94,7 +118,6 @@ function sayNumbers(move) {
 }
 
 function systemMove() {
-  // If system starts, it must say 1.
   if (current === 0) {
     return 1;
   }
@@ -123,17 +146,34 @@ function checkLoss(playerName) {
     disableButtons();
 
     if (playerName === "You") {
+      winner = "System";
       addInfo("You said 21. You lost.");
       addMessage("system", "System", "I win");
     } else {
+      winner = "You";
       addInfo("System said 21. You win!");
       addMessage("system", "System", "I lost");
     }
 
+    showShareResult();
     return true;
   }
 
   return false;
+}
+
+function showShareResult() {
+  const gameLink = window.location.href;
+
+  shareText.value =
+`I played Don’t Say 21.
+
+Winner: ${winner}
+Final number: ${current}
+
+Play here: ${gameLink}`;
+
+  shareBox.classList.remove("hidden");
 }
 
 function addMessage(type, name, text) {
@@ -174,13 +214,11 @@ function updateMoveButtons() {
   moveButtons.forEach(button => {
     const move = Number(button.dataset.move);
 
-    // At the beginning, only +1 is allowed because the game must start with 1.
     if (current === 0 && move !== 1) {
       button.disabled = true;
       return;
     }
 
-    // Do not allow moves beyond 21.
     if (current + move > 21) {
       button.disabled = true;
       return;
