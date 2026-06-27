@@ -8,28 +8,7 @@ const currentNumberEl = document.getElementById("currentNumber");
 const resetBtn = document.getElementById("resetBtn");
 const moveButtons = document.querySelectorAll(".moveBtn");
 
-const shareBox = document.getElementById("shareBox");
-const shareText = document.getElementById("shareText");
-const copyBtn = document.getElementById("copyBtn");
-
 resetBtn.addEventListener("click", resetGame);
-
-copyBtn.addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(shareText.value);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => {
-      copyBtn.textContent = "Copy result";
-    }, 1200);
-  } catch {
-    shareText.select();
-    document.execCommand("copy");
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => {
-      copyBtn.textContent = "Copy result";
-    }, 1200);
-  }
-});
 
 moveButtons.forEach(button => {
   button.addEventListener("click", () => {
@@ -42,15 +21,13 @@ function resetGame() {
   current = 0;
   gameOver = false;
   winner = "";
+  userTurn = true;
   chatEl.innerHTML = "";
   currentNumberEl.textContent = current;
-  shareBox.classList.add("hidden");
-  shareText.value = "";
 
   const userStarts = Math.random() < 0.5;
 
   if (userStarts) {
-    userTurn = true;
     addInfo("Your turn");
     enableButtons();
     updateMoveButtons();
@@ -60,7 +37,7 @@ function resetGame() {
 
     setTimeout(() => {
       const systemNumbers = sayNumbers(1);
-      addMessage("system", "System", String(systemNumbers[systemNumbers.length - 1]));
+      addMessage("system", "System", String(last(systemNumbers)));
 
       if (checkLoss("System")) return;
 
@@ -78,9 +55,7 @@ function userMove(move) {
   if (current === 0 && move !== 1) return;
 
   const userNumbers = sayNumbers(move);
-  const userLastNumber = userNumbers[userNumbers.length - 1];
-
-  addMessage("you", "You", String(userLastNumber));
+  addMessage("you", "You", String(last(userNumbers)));
 
   if (checkLoss("You")) return;
 
@@ -90,9 +65,8 @@ function userMove(move) {
   setTimeout(() => {
     const systemChoice = systemMove();
     const systemNumbers = sayNumbers(systemChoice);
-    const systemLastNumber = systemNumbers[systemNumbers.length - 1];
 
-    addMessage("system", "System", String(systemLastNumber));
+    addMessage("system", "System", String(last(systemNumbers)));
 
     if (checkLoss("System")) return;
 
@@ -110,7 +84,10 @@ function sayNumbers(move) {
     current += 1;
     numbers.push(current);
 
-    if (current === 21) break;
+    if (current >= 21) {
+      current = 21;
+      break;
+    }
   }
 
   currentNumberEl.textContent = current;
@@ -165,15 +142,43 @@ function checkLoss(playerName) {
 function showShareResult() {
   const gameLink = window.location.href;
 
-  shareText.value =
-`I played Don’t Say 21.
+  const winnerText = winner === "You" ? "You 🙂" : "System 🙁";
 
-Winner: ${winner}
-Final number: ${current}
+  const text =
+    `I played "Don’t Say 21."
 
-Play here: ${gameLink}`;
+    Winner: ${winnerText}
 
-  shareBox.classList.remove("hidden");
+    Play here: ${gameLink}`;
+
+  const card = document.createElement("div");
+  card.className = "share-card";
+
+  const textarea = document.createElement("textarea");
+  textarea.readOnly = true;
+  textarea.value = text;
+
+  const button = document.createElement("button");
+  button.textContent = "Copy result";
+
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(textarea.value);
+    } catch {
+      textarea.select();
+      document.execCommand("copy");
+    }
+
+    button.textContent = "Copied!";
+    setTimeout(() => {
+      button.textContent = "Copy result";
+    }, 1200);
+  });
+
+  card.appendChild(textarea);
+  card.appendChild(button);
+  chatEl.appendChild(card);
+  chatEl.scrollTop = chatEl.scrollHeight;
 }
 
 function addMessage(type, name, text) {
@@ -219,13 +224,12 @@ function updateMoveButtons() {
       return;
     }
 
-    if (current + move > 21) {
-      button.disabled = true;
-      return;
-    }
-
     button.disabled = false;
   });
+}
+
+function last(arr) {
+  return arr[arr.length - 1];
 }
 
 resetGame();
