@@ -113,7 +113,7 @@ function systemMove() {
 
   // System plays smart only sometimes.
   // Lower = easier, higher = harder.
-  const smartChance = 0.45;
+  const smartChance = 0.2;
 
   if (Math.random() < smartChance) {
     for (const move of safeMoves) {
