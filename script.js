@@ -221,11 +221,14 @@ function updateMoveButtons() {
   moveButtons.forEach(button => {
     const move = Number(button.dataset.move);
 
+    // At the start, only +1 is allowed because the game must start with 1.
     if (current === 0 && move !== 1) {
       button.disabled = true;
       return;
     }
 
+    // Keep +1, +2, +3 available near the end.
+    // If current is 20, any button press ends at 21 and the player loses.
     button.disabled = false;
   });
 }
