@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Don't Say 21</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="phone">
+    <header class="topbar">
+      <div>
+        <h1>Don’t Say 21</h1>
+        <p>
+          Say 1, 2, or 3 numbers each turn. The game always starts with 1.
+          The maximum number is 21. Whoever says 21 loses.
+        </p>
+      </div>
+
+      <button id="resetBtn">Reset</button>
+    </header>
+
+    <section id="chat" class="chat"></section>
+
+    <section class="controls">
+      <div class="current">
+        Current: <span id="currentNumber">0</span>
+      </div>
+
+      <div class="move-buttons">
+        <button class="moveBtn" data-move="1">+1</button>
+        <button class="moveBtn" data-move="2">+2</button>
+        <button class="moveBtn" data-move="3">+3</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
